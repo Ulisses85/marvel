@@ -10,45 +10,77 @@ import {
   StyleSheet,
   Text,
   View,
-  Navigator
+  Navigator,
+  TouchableHighlight
 } from 'react-native';
 
 import LoginView from './src/components/loginView.js';
 import DashboardView from'./src/components/dashboardView.js';
 
+const NavigatorBarRouteMapper = {
+  LeftButton: function(route, navigator, index) {
+    if(route.name == 'LoginView') {
+      return null;
+    }
+    return(
+      <TouchableHighlight onPress={()=>{
+        if(index > 0){
+          navigator.pop();
+        }
+      }}>
+      <Text style={{marginTop:10, marginLeft:20, color:'#007AFF' }}>Atras</Text>
+      </TouchableHighlight>
+
+    )
+  },
+  RightButton: function(route, navigator, index) {
+    return null;
+  },
+  Title: function(route, navigator, index){
+    return(
+      <Text style={{marginTop:10, color:'#007AFF'}}>
+      {route.name}
+      </Text>
+    )
+  }
+};
+
 export default class marvel extends Component {
+  renderScene (route, navigator) {
+    switch (route.name) {
+      case 'LoginView':
+        return (
+          <LoginView navigator={navigator} route={route} />
+        )
+      case 'DashboardView':
+        return (
+          <DashboardView navigator={navigator} route={route} />
+        );
+    }
+  }
 
   render () {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <View>
-        <LoginView></LoginView>
-        </View>
-      </View>
-    );
+      <Navigator style={{backgroundColor: '#fff'}}
+        initialRoute={{name: 'LoginView'}}
+        renderScene={this.renderScene}
+        configureScene={(route) => {
+          if (route.sceneConfig) {
+            return route.sceneConfig;
+          }
+          return Navigator.SceneConfigs.floatFromRight;
+        }}
+        navigationBar={
+          <Navigator.NavigationBar
+            routeMapper={NavigatorBarRouteMapper}
+          />
+        } />
+    )
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+
 });
 
 AppRegistry.registerComponent('marvel', () => marvel);
